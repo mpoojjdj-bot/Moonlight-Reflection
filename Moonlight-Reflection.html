@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>أداة انعكاس ضوء القمر — Moonlight Reflection</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Readex+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#070b16;--card:#0d1526;--line:#22304c;--moon:#f1ead2;--sky:#8cc8ff;--tx:#e8edf8;--mu:#8f9bb8;--bad:#ffb4a2;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:radial-gradient(900px 420px at 88% -8%,#1b2656 0,transparent 62%),radial-gradient(700px 380px at -8% 112%,#11203f 0,transparent 60%),var(--bg);color:var(--tx);font:400 15px/1.75 "Readex Pro",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:16px;padding:26px clamp(16px,4vw,48px) 8px;max-width:1080px;margin:auto}
+.moon{position:relative;width:58px;height:58px;flex:none;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fffdf5,var(--moon) 48%,#b7af8c);box-shadow:0 0 42px 8px rgba(241,234,210,.2)}
+.moon::after{content:"";position:absolute;left:12%;top:120%;width:76%;height:26px;background:radial-gradient(closest-side,rgba(241,234,210,.22),transparent);filter:blur(3px)}
+h1{margin:0;font-size:clamp(21px,3.4vw,28px);font-weight:700}
+.sub{margin:2px 0 0;color:var(--mu);font-size:14px}
+nav{display:flex;gap:8px;overflow-x:auto;max-width:1080px;margin:auto;padding:14px clamp(16px,4vw,48px) 4px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mu);cursor:pointer}
+.tab[aria-selected=true],.tab:hover{color:var(--tx);border-color:var(--sky);background:#132139}
+main{max-width:1080px;margin:auto;padding:14px clamp(16px,4vw,48px) 70px}
+.pane{display:none}.pane.on{display:block}
+h2{margin:6px 0 4px;font-size:clamp(22px,3vw,30px);font-weight:700}
+h3{margin:0 0 10px;font-size:17px}
+.d{color:var(--mu);margin:0 0 18px;font-size:14.5px}
+.box,.drop{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.tile{all:unset;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px;transition:border-color .2s,transform .2s}
+.tile:hover,.tile:focus-visible{border-color:var(--sky);transform:translateY(-2px)}
+.tile b{font-size:18px}.tile span{color:var(--mu);font-size:14px}
+.ico{font-size:26px}
+.search{width:100%;max-width:360px;margin:6px 0 18px;background:#0a1221;border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--tx)}
+.drop{display:block;text-align:center;cursor:pointer;border-style:dashed;position:relative;padding:26px 16px}
+.drop:hover{border-color:var(--sky)}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.drop b{display:block;font-weight:600}
+.drop small,.cnt{display:block;color:var(--mu);font-size:13px;margin-top:4px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:12px 0}
+label{display:grid;gap:5px;color:var(--mu);font-size:13px}
+select,input[type=text],input:not([type]),textarea{background:#0a1221;border:1px solid var(--line);border-radius:11px;padding:10px 12px;color:var(--tx)}
+textarea{width:100%;min-height:120px;resize:vertical;margin:6px 0}
+input[type=range]{accent-color:var(--moon)}
+input[type=color]{width:52px;height:40px;padding:2px;border-radius:10px;border:1px solid var(--line);background:#0a1221}
+.go,.tools button,.chip,.row button{border:1px solid var(--line);background:#172541;color:var(--tx);border-radius:11px;padding:10px 16px;cursor:pointer}
+.go{background:var(--moon);color:#141a2b;border-color:var(--moon);font-weight:700}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.prev{display:grid;place-items:center;min-height:60px;margin:6px 0}
+.pv{max-width:100%;max-height:360px;border-radius:12px;box-shadow:0 10px 40px #0008}
+.out{margin-top:10px;line-height:1.8}.out p{margin:6px 0}.out ol{padding-inline-start:22px}
+.bad{color:var(--bad)}
+.chip{margin:4px 6px 4px 0;font-size:14px;padding:6px 12px}
+@media(max-width:560px){header{padding-top:18px}.row>*{flex:1 1 140px}}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;background-image:radial-gradient(1px 1px at 12% 18%,rgba(232,237,248,.55),transparent),radial-gradient(1px 1px at 72% 9%,rgba(232,237,248,.4),transparent),radial-gradient(1.5px 1.5px at 40% 62%,rgba(232,237,248,.35),transparent),radial-gradient(1px 1px at 88% 74%,rgba(232,237,248,.45),transparent);opacity:.7}
+nav{position:sticky;top:0;z-index:5;background:rgba(7,11,22,.78);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid #15203a}
+.moon{animation:glow 7s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 64px 14px rgba(241,234,210,.3)}}
+.pane>h2{padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.tile{min-height:120px}
+.tile:hover,.tile:focus-visible{background:#11203a}
+.drop.over{border-color:var(--sky);background:#11203a}
+.go{transition:filter .2s}
+.go:hover{filter:brightness(1.06)}
+.tools button:hover,.row button:hover{border-color:var(--sky)}
+.box{box-shadow:0 1px 0 #ffffff08 inset}
+@media (prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
+#sub{display:flex;gap:8px;flex-wrap:wrap;max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,48px) 6px}
+#sub:empty{display:none}
+#sub .tab{font-size:14px;padding:6px 14px;border-color:#1c2a45}
+:root{--bg:#0d1831;--card:rgba(246,239,220,.045);--line:rgba(242,184,201,.2);--moon:#f6efdc;--sky:#f2b8c9;--tx:#f4efe6;--mu:#b9c0d6;--bad:#ffb3a7}
+body{font-family:'Zen Kaku Gothic New','Readex Pro',system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;background:radial-gradient(900px 480px at 85% -10%,rgba(246,239,220,.13),transparent 60%),radial-gradient(800px 420px at 0% 110%,rgba(242,184,201,.12),transparent 60%),linear-gradient(180deg,#0b1530,#132457 70%,#1a2d5e)}
+body::before{background-image:repeating-radial-gradient(circle at 50% 120%,transparent 0 46px,rgba(246,239,220,.035) 47px 48px),radial-gradient(1px 1px at 12% 18%,rgba(246,239,220,.7),transparent),radial-gradient(1px 1px at 72% 9%,rgba(246,239,220,.5),transparent),radial-gradient(1.5px 1.5px at 40% 62%,rgba(246,239,220,.4),transparent);opacity:.9}
+h1,h2,h3{font-family:'Shippori Mincho','Readex Pro',serif;letter-spacing:0}
+h1::before{content:'月';display:inline-grid;place-items:center;width:32px;height:32px;margin-inline-end:12px;border-radius:5px;background:#c8452f;color:#fff8f0;font:700 17px/1 'Shippori Mincho',serif;vertical-align:middle;box-shadow:inset 0 0 0 2px rgba(255,255,255,.12)}
+.moon{background:radial-gradient(circle at 34% 30%,#fffdf5,#f6efdc 48%,#cfc7a6 100%)}
+nav{background:rgba(11,21,48,.7)}
+.tab{background:rgba(246,239,220,.03)}
+.tab[aria-selected=true],.tab:hover{background:rgba(242,184,201,.14);border-color:#f2b8c9;color:#fff}
+.box,.drop,.tile{background:rgba(246,239,220,.045);border-color:var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.tile{position:relative;overflow:hidden}
+.tile::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,#f2b8c9,transparent 80%);opacity:.8}
+.tile:hover,.tile:focus-visible{background:rgba(242,184,201,.1);border-color:#f2b8c9}
+.pane>h2{border-bottom-color:var(--line)}
+.go{background:linear-gradient(180deg,#faf3e2,#e6d8b8);border-color:#e6d8b8}
+.petal{position:fixed;top:-8vh;width:var(--s);height:calc(var(--s)*.78);background:radial-gradient(ellipse at 30% 30%,#fff1f5,#f4b6c8 65%,#e48fab);border-radius:0 80% 0 80%;opacity:.8;pointer-events:none;z-index:-1;animation:fall var(--d) linear var(--dl) infinite}
+@keyframes fall{0%{transform:translate3d(0,0,0) rotate(0)}100%{transform:translate3d(var(--x),112vh,0) rotate(600deg)}}
+.pal{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.sw{width:88px;height:74px;border:0;border-radius:12px;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding:6px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.sw span{font-size:12px;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:6px;color:#fff}
+.moon{position:relative;width:64px;height:64px;background:radial-gradient(circle at 32% 28%,#fffdf6 0%,#f7f0dc 30%,#dfd6bb 62%,#b8ad90 100%);box-shadow:inset -10px -8px 20px rgba(70,60,45,.35),0 0 44px 10px rgba(246,239,220,.26),0 0 110px 26px rgba(242,184,201,.1)}
+.moon::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 20% 15% at 38% 42%,rgba(140,130,110,.38),transparent 70%),radial-gradient(ellipse 17% 13% at 63% 60%,rgba(140,130,110,.32),transparent 70%),radial-gradient(ellipse 13% 10% at 52% 26%,rgba(140,130,110,.24),transparent 70%),radial-gradient(circle at 28% 64%,transparent 0 3px,rgba(110,100,85,.28) 4px,transparent 6px),radial-gradient(circle at 71% 36%,transparent 0 2px,rgba(110,100,85,.24) 3px,transparent 5px),radial-gradient(circle at 47% 76%,transparent 0 2.5px,rgba(110,100,85,.2) 3.5px,transparent 6px)}
+@keyframes glow{50%{box-shadow:inset -10px -8px 20px rgba(70,60,45,.35),0 0 60px 14px rgba(246,239,220,.32),0 0 120px 30px rgba(242,184,201,.14)}}
+.pvw{margin:-6px 0 14px}.pvw .pv{max-height:260px}
+.rescard{border-color:#f2b8c9}.rescard h3{margin-top:0}
+.chk{display:flex;align-items:center;gap:8px}
+
+/* Moonlight Sakura: deep-black theme */
+:root{--bg:#030305;--card:#0a080d;--line:#30202c;--moon:#fff0f6;--sky:#f2a9c7;--tx:#f8f2f6;--mu:#b7a6b2;--bad:#ff9eaf}
+body{background:radial-gradient(850px 430px at 88% -10%,rgba(106,35,75,.19),transparent 62%),radial-gradient(650px 350px at -8% 112%,rgba(76,25,65,.13),transparent 60%),#030305}
+nav{background:rgba(3,3,5,.92);border-bottom-color:#24151f}
+.tab[aria-selected=true],.tab:hover{background:rgba(242,169,199,.12);border-color:#f2a9c7;color:#fff4fa}
+.box,.drop,.tile{background:rgba(10,8,13,.94);border-color:#30202c;backdrop-filter:blur(10px)}
+.tile:hover,.tile:focus-visible{background:#120b12;border-color:#f2a9c7}
+.go{background:linear-gradient(135deg,#f9dce8,#d989ac);border-color:#e8a6c1;color:#170911;box-shadow:0 4px 22px #a33a6820}
+input,select,textarea,.search{background:#070609!important;border-color:#30202c!important}
+.moon{background:radial-gradient(circle at 32% 28%,#fffdfd 0%,#fff0f6 30%,#dfc7d0 62%,#9f8292 100%);box-shadow:inset -10px -8px 20px rgba(50,25,42,.4),0 0 38px 9px rgba(255,224,239,.2),0 0 95px 18px rgba(242,169,199,.09)}
+.moon::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 20% 15% at 38% 42%,rgba(140,100,120,.32),transparent 70%),radial-gradient(ellipse 17% 13% at 63% 60%,rgba(140,100,120,.28),transparent 70%),radial-gradient(ellipse 13% 10% at 52% 26%,rgba(140,100,120,.22),transparent 70%)}
+.petal{z-index:0;opacity:.24;pointer-events:none}
+
+</style>
+</head>
+<body>
+<header><div class="moon" aria-hidden="true"></div><div><h1>أداة انعكاس ضوء القمر</h1><p class="sub">Moonlight Reflection · أدوات الملفات والصور والصوت تعمل داخل متصفحك</p></div></header>
+<nav id="nav" aria-label="الأدوات">
+<button class="tab" data-go="home" aria-selected="true">الرئيسية</button>
+<button class="tab" data-go="image" aria-selected="false">الصور</button>
+<button class="tab" data-go="pdf" aria-selected="false">PDF</button>
+<button class="tab" data-go="zip" aria-selected="false">ضغط وفك</button>
+<button class="tab" data-go="media" aria-selected="false">صوت وفيديو</button>
+<button class="tab" data-go="voice" aria-selected="false">كلام ونص</button>
+<button class="tab" data-go="text" aria-selected="false">نصوص وترجمة</button><button class='tab' data-go='video' aria-selected='false'>فيديو وGIF</button><button class='tab' data-go='ai' aria-selected='false'>توليد صور</button><button class='tab' data-go='download' aria-selected='false'>التحميل</button>
+</nav>
+<main>
+<section class="pane on" id="p-home">
+<h2>كل أدواتك في مكان واحد</h2>
+<p class="d">اختر أداة وارفع ملفك. تتم المعالجة على جهازك، ولا يُرفع الملف إلى أي خادم.</p>
+<input class="search" id="q" type="text" placeholder="ابحث عن أداة…" aria-label="بحث عن أداة">
+<div class="grid" id="tiles">
+<button class="tile" data-go="image"><span class="ico">🖼️</span><b>الصور</b><span>تحويل بين PNG وJPG وWEBP وBMP وICO، وضغط وتدوير وتعديل.</span></button>
+<button class="tile" data-go="pdf"><span class="ico">📄</span><b>PDF</b><span>صور إلى PDF، ودمج الملفات، وتحويل الصفحات إلى صور.</span></button>
+<button class="tile" data-go="zip"><span class="ico">🗜️</span><b>ضغط وفك ZIP</b><span>اضغط ملفات في أرشيف، أو افتح أرشيفًا واستخرج ما فيه.</span></button>
+<button class="tile" data-go="media"><span class="ico">🎵</span><b>صوت وفيديو</b><span>استخرج الصوت من الفيديو وحوّله إلى MP3 أو WAV.</span></button>
+<button class="tile" data-go="voice"><span class="ico">🗣️</span><b>كلام ونص</b><span>حوّل النص إلى كلام بلغات متعددة، أو الكلام إلى نص.</span></button>
+<button class="tile" data-go="text"><span class="ico">📝</span><b>نصوص وترجمة</b><span>حوّل النص إلى ملف أو صورة جاهزة للنشر، وترجمه.</span></button>
+<button class='tile' data-go='video'><span class='ico'>🎬</span><b>فيديو وGIF</b><span>حوّل الفيديو إلى MP4 أو GIF، واجمع الصور في GIF.</span></button><button class='tile' data-go='download'><span class='ico'>⬇️</span><b>التحميل</b><span>الصق رابط فيديو من المنصات المدعومة وحاول تنزيله.</span></button>
+<button class='tile' data-go='ai'><span class='ico'>✨</span><b>توليد صور</b><span>صورة من نص عبر نموذج مفتوح المصدر يعمل على جهازك.</span></button>
+</div>
+</section>
+
+<section class="pane" id="p-image">
+<h2>الصور</h2>
+<p class="d">حوّل الصيغة، واضغط الصورة، وعدّلها. كل شيء يتم داخل جهازك.</p>
+<label class="drop"><input type="file" accept="image/*" data-in="img"><b>اختر صورة أو اسحبها هنا</b><small>JPG · PNG · WEBP · GIF · BMP · SVG</small><span class="cnt"></span></label>
+<div class="tools"><button onclick="ed('l')">تدوير يسار</button><button onclick="ed('r')">تدوير يمين</button><button onclick="ed('fh')">قلب أفقي</button><button onclick="ed('fv')">قلب عمودي</button><button onclick="ed('g')">أبيض وأسود</button><button onclick="ed('i')">عكس الألوان</button></div>
+<div class='box' style='margin:14px 0'><h3>أدوات التحرير</h3><div class='row'><label>قص حسب النسبة<select id='cropR'><option value=''>اختر</option><option value='1:1'>1:1 مربع</option><option value='4:3'>4:3</option><option value='16:9'>16:9</option><option value='9:16'>9:16 طولي</option></select></label><button onclick='crop()'>قص</button><button onclick='round()'>زوايا دائرية</button><button onclick='sharp()'>زيادة الحدة</button><button onclick='blurIt()'>تنعيم</button></div><div class='row'><label>السطوع<input id='fB' type='range' min='.5' max='1.5' step='.05' value='1'></label><label>التباين<input id='fC' type='range' min='.5' max='1.5' step='.05' value='1'></label><label>التشبع<input id='fS' type='range' min='0' max='2' step='.05' value='1'></label><button onclick='applyAdj()'>تطبيق الضبط</button><button onclick='adj((r,g,b)=>[.393*r+.769*g+.189*b,.349*r+.686*g+.168*b,.272*r+.534*g+.131*b])'>بني قديم</button></div><div class='row'><input id='wm' type='text' placeholder='نص يُكتب على الصورة'><button onclick='txt()'>إضافة النص</button><button onclick='undo()'>تراجع</button></div></div>
+<div id="imgPrev" class="prev"></div>
+<div class="row">
+<label>الصيغة<select id="imgFmt"><option value="image/webp">WEBP</option><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="bmp">BMP</option><option value="ico">ICO</option></select></label>
+<label>الجودة<select id="imgQ"><option value=".92">عالية</option><option value=".75" selected>متوازنة</option><option value=".5">ضغط أكبر</option><option value=".25">أصغر حجم</option></select></label>
+<label>أقصى عرض<select id="imgW"><option value="0">الأصلي</option><option value="1920">1920 px</option><option value="1280">1280 px</option><option value="800">800 px</option></select></label>
+<button class="go" onclick="exportImg()">تحويل وتنزيل</button>
+</div>
+<div id="imgOut" class="out"></div>
+</section>
+
+<section class="pane" id="p-pdf">
+<h2>PDF</h2>
+<p class="d">حوّل الصور إلى PDF، وادمج عدة ملفات، واستخرج صفحات PDF كصور.</p>
+<div class="grid2">
+<div class="box"><h3>صور إلى PDF</h3><label class="drop"><input type="file" multiple accept="image/*" data-in="pdfimg"><b>اختر الصور</b><span class="cnt"></span></label><button class="go" onclick="runPdf('img')">إنشاء PDF</button></div>
+<div class="box"><h3>دمج PDF</h3><label class="drop"><input type="file" multiple accept="application/pdf" data-in="pdfmerge"><b>اختر ملفات PDF</b><span class="cnt"></span></label><button class="go" onclick="runPdf('merge')">دمج وتنزيل</button></div>
+<div class="box"><h3>PDF إلى صور</h3><label class="drop"><input type="file" accept="application/pdf" data-in="pdfsplit"><b>اختر ملف PDF</b><span class="cnt"></span></label><button class="go" onclick="runPdf('split')">تحويل الصفحات إلى PNG</button></div>
+</div>
+<div id="pdfOut" class="out"></div>
+</section>
+
+<section class="pane" id="p-zip">
+<h2>ضغط وفك ZIP</h2>
+<p class="d">اضغط عدة ملفات في أرشيف واحد، أو افتح ملف ZIP واستخرج محتوياته.</p>
+<div class="grid2">
+<div class="box"><h3>ضغط ملفات</h3><label class="drop"><input type="file" multiple data-in="zipin"><b>اختر الملفات</b><span class="cnt"></span></label><button class="go" onclick="runZip('pack')">إنشاء ZIP</button></div>
+<div class="box"><h3>فك ضغط ZIP</h3><label class="drop"><input type="file" accept=".zip,application/zip" data-in="unzip"><b>اختر ملف ZIP</b><span class="cnt"></span></label><button class="go" onclick="runZip('unpack')">عرض الملفات</button></div>
+</div>
+<div id="zOut" class="out"></div>
+</section>
+
+<section class="pane" id="p-media">
+<h2>صوت وفيديو</h2>
+<p class="d">استخرج الصوت من فيديو مدعوم في متصفحك، أو حوّل ملفًا صوتيًا إلى MP3 أو WAV.</p>
+<label class="drop"><input type="file" accept="audio/*,video/*" data-in="media"><b>اختر ملف صوت أو فيديو</b><small>MP4 · MOV · WEBM · MP3 · WAV · M4A · OGG</small><span class="cnt"></span></label>
+<div class="row">
+<label>الصيغة<select id="mFmt"><option value="mp3">MP3</option><option value="wav">WAV</option></select></label>
+<label>جودة MP3<select id="mBr"><option value="128">128 kbps</option><option value="192">192 kbps</option><option value="320">320 kbps</option></select></label>
+<button class="go" onclick="runMedia()">استخراج وتنزيل</button>
+</div>
+<div id="mOut" class="out"></div>
+</section>
+
+<section class="pane" id="p-voice">
+<h2>كلام ونص</h2>
+<p class="d">حوّل النص إلى كلام بلغات متعددة، أو حوّل كلامك إلى نص من الميكروفون.</p>
+<div class="box"><h3>نص إلى كلام</h3>
+<textarea id="ttsIn" placeholder="اكتب النص هنا…"></textarea>
+<div class="row"><label>اللغة<select id="ttsLang" data-lang></select></label><label>السرعة<input id="ttsRate" type="range" min=".5" max="2" step=".1" value="1"></label><button class="go" onclick="speak()">تشغيل</button><button onclick="speechSynthesis.cancel()">إيقاف</button></div>
+</div>
+<div class="box"><h3>كلام إلى نص</h3>
+<div class="row"><label>اللغة<select id="sttLang" data-lang></select></label><button class="go" id="micBtn" onclick="mic()">بدء الاستماع</button></div>
+<textarea id="sttOut" placeholder="سيظهر النص هنا…"></textarea>
+<small class="d">يعمل في Chrome وEdge وSafari.</small>
+<button onclick='sendToAi()'>توليد صورة من هذا النص</button>
+</div>
+<div id="vOut" class="out"></div>
+</section>
+
+<section class="pane" id="p-text">
+<h2>نصوص وترجمة</h2>
+<p class="d">حوّل النص إلى ملف أو صورة جاهزة للنشر، ولخّصه إلى نقاط، أو ترجمه.</p>
+<div class="box"><h3>نص إلى ملف</h3>
+<textarea id="docIn" placeholder="اكتب المحتوى هنا…"></textarea>
+<div class="row"><label>اسم الملف<input id="docName" type="text" value="مستندي"></label><label>الصيغة<select id="docFmt"><option value="txt">TXT</option><option value="md">MD</option><option value="html">HTML</option><option value="csv">CSV</option><option value="json">JSON</option></select></label><button class="go" onclick="textFile()">تنزيل</button><button onclick="points()">استخراج النقاط</button></div>
+<div id="docOut" class="out"></div>
+</div>
+<div class="box"><h3>نص إلى صورة</h3>
+<textarea id="posIn" placeholder="النص الذي يظهر على الصورة…"></textarea>
+<div class="row"><label>الخلفية<input id="posBg" type="color" value="#0e1627"></label><label>لون النص<input id="posFg" type="color" value="#f1ead2"></label><label>المقاس<select id="posSize"><option value="1080,1080">1080 × 1080</option><option value="1200,630">1200 × 630</option></select></label><button class="go" onclick="textImg()">إنشاء PNG</button></div>
+</div>
+<div class="box"><h3>ترجمة</h3>
+<div class="row"><label>من<select id="trFrom" data-lang></select></label><label>إلى<select id="trTo" data-lang></select></label><button class="go" onclick="trans()">ترجمة</button></div>
+<textarea id="trIn" placeholder="اكتب النص للترجمة…"></textarea>
+<div id="trOut" class="out"></div>
+<small class="d">تعتمد الترجمة على خدمة الترجمة المدمجة في Chrome الحديث.</small>
+</div>
+</section>
+<section class='pane' id='p-video'><h2>فيديو وGIF</h2><p class='d'>حوّل الفيديو إلى MP4 أو GIF متحرك، واجمع الصور في GIF أو فيديو. التحويل إلى MP4 يتم أثناء تشغيل الفيديو، لذا يستغرق مدته نفسها.</p><div class='box'><h3>فيديو</h3><label class='drop'><input type='file' accept='video/*' data-in='vid'><b>اختر فيديو</b><small>MP4 · WEBM · MOV</small><span class='cnt'></span></label><div class='row'><label>الإطارات في الثانية (GIF)<select id='gFps'><option value='5'>5</option><option value='10' selected>10</option><option value='15'>15</option></select></label><label>عرض GIF<select id='gW'><option value='240'>240 px</option><option value='360' selected>360 px</option><option value='480'>480 px</option></select></label></div><div class='row'><button class='go' onclick='runVid()'>تحويل إلى MP4</button><button class='go' onclick='gv()'>تحويل إلى GIF</button><button onclick='vStop()'>إيقاف</button></div></div><div class='box'><h3>صور إلى GIF أو فيديو</h3><label class='drop'><input type='file' multiple accept='image/*' data-in='gimgs'><b>اختر الصور بالترتيب</b><span class='cnt'></span></label><div class='row'><button class='go' onclick='gi()'>إنشاء GIF</button><button onclick='runSlides()'>إنشاء فيديو (كل صورة ثانيتين)</button></div></div><div id='vidOut' class='out'></div></section>
+<section class='pane' id='p-ai'><h2>توليد صور بنماذج مفتوحة المصدر</h2><p class='d'>تُولَّد الصورة على نموذج مفتوح المصدر تشغّله على جهازك، مثل Stable Diffusion WebUI من AUTOMATIC1111 مع خيار --api. النماذج تزن جيجابايتات، لذلك لا تُضمَّن داخل الصفحة. من المعاينة داخل claude.ai قد يمنع المتصفح الاتصال بالخادم المحلي، فافتح الملف على جهازك.</p><div class='box'><label>عنوان الخادم المحلي<input id='sdUrl' type='text' value='http://127.0.0.1:7860' dir='ltr'></label><textarea id='sdP' placeholder='صِف الصورة التي تريدها…'></textarea><div class='row'><label>المقاس<select id='sdSize'><option value='512,512'>512 × 512</option><option value='768,512'>768 × 512</option><option value='512,768'>512 × 768</option></select></label><button class='go' onclick='genImg()'>توليد الصورة</button></div></div><div id='sdOut' class='out'></div></section>
+
+<section class="pane" id="p-download"><h2>التحميل</h2><p class="d">الصق رابط المنشور أو الفيديو. نحاول طلب رابط تنزيل من خدمة خارجية؛ نجاح التنزيل يعتمد على دعم المنصة وتوفر الخدمة.</p><div class="box"><label style="width:100%">رابط المحتوى<input id="dlUrl" type="text" dir="ltr" placeholder="https://…" autocomplete="url" style="width:100%"></label><div class="row"><label>المنصة<select id="dlPlatform"><option value="auto">تحديد تلقائي</option><option>YouTube</option><option>TikTok</option><option>Instagram</option><option>Reddit</option><option>X</option></select></label><label>الصيغة<select id="dlFormat"><option value="video">فيديو</option><option value="audio">صوت فقط (إن دعمته الخدمة)</option></select></label></div><button class="go" id="dlStart" type="button" onclick="startLinkDownload()">التحميل</button><div id="dlStatus" class="out" role="status" aria-live="polite"></div><p class="d">إذا لم تعمل الخدمة، استخدم رابط المنصة الأصلي أو جرّب لاحقًا. لا تدخل بيانات حسابك هنا.</p></div><div class="box"><h3>المنصات</h3><p class="d">YouTube · TikTok · Reddit · Instagram · X</p><a href="https://cobalt.tools/" target="_blank" rel="noopener" class="chip">فتح Cobalt</a></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),F={},PL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',JZ='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',PJ='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',PJW='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',LJ='https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js',LG=[['ar-SA','العربية'],['en-US','English'],['fr-FR','Français'],['es-ES','Español'],['de-DE','Deutsch'],['tr-TR','Türkçe'],['ur-PK','اردو'],['fa-IR','فارسی'],['hi-IN','हिन्दी'],['zh-CN','中文'],['ja-JP','日本語'],['ko-KR','한국어'],['ru-RU','Русский'],['it-IT','Italiano'],['pt-BR','Português']];
+let IC=null,IN='image',IS=0,ZZ=null,rec=null;
+const fmt=n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(2)+' MB';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const out=(id,h)=>{$('#'+id).innerHTML=h},err=(id,e)=>out(id,`<p class="bad">${esc(e&&e.message?e.message:e)}</p>`);
+function save(b,n){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},5000)}
+const LIBS={};
+const lib=u=>LIBS[u]||(LIBS[u]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;s.onload=res;s.onerror=()=>{delete LIBS[u];rej(new Error('تعذر تحميل مكتبة من الشبكة، تحقق من الاتصال'))};document.head.append(s)}));
+
+function go(id){document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+id));document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.go===id));scrollTo(0,0)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+addEventListener('dragover',e=>e.preventDefault());
+addEventListener('drop',e=>{e.preventDefault();const z=e.target.closest&&e.target.closest('.drop');if(!z)return;const i=z.querySelector('input');i.files=e.dataTransfer.files;i.dispatchEvent(new Event('change',{bubbles:true}))});
+$('#q').oninput=e=>{const v=e.target.value.trim();document.querySelectorAll('#tiles .tile').forEach(t=>t.hidden=!t.textContent.includes(v))};
+document.querySelectorAll('select[data-lang]').forEach(s=>s.innerHTML=LG.map(([c,n])=>`<option value="${c}">${n}</option>`).join(''));
+$('#trFrom').value='en-US';$('#trTo').value='ar-SA';$('#ttsLang').value='ar-SA';$('#sttLang').value='ar-SA';
+const H={img:f=>loadImg(f[0]).then(c=>{IC=c;IN=f[0].name.replace(/\.[^.]+$/,'')||'image';IS=f[0].size;showImg()}).catch(e=>err('imgOut',e))};
+document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.in;if(!k)return;F[k]=[...e.target.files];const c=e.target.closest('.drop').querySelector('.cnt');if(c)c.textContent=F[k].length?F[k].length+' ملف: '+F[k][0].name:'';if(H[k])H[k](F[k])});
+
+/* ---------- الصور ---------- */
+function loadImg(f){return new Promise((res,rej)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.naturalWidth||1024;c.height=im.naturalHeight||1024;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('تعذر قراءة هذه الصورة في المتصفح'))};im.src=u})}
+function showImg(){IC.className='pv';$('#imgPrev').replaceChildren(IC);out('imgOut',`<p>الأبعاد: ${IC.width} × ${IC.height} · حجم الملف الأصلي: ${fmt(IS)}</p>`)}
+function ed(op){if(!IC)return err('imgOut','اختر صورة أولًا');hist();const w=IC.width,h=IC.height;let c;
+if(op==='r'||op==='l'){c=document.createElement('canvas');c.width=h;c.height=w;const x=c.getContext('2d');x.translate(op==='r'?h:0,op==='r'?0:w);x.rotate((op==='r'?1:-1)*Math.PI/2);x.drawImage(IC,0,0)}
+else if(op==='fh'||op==='fv'){c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.translate(op==='fh'?w:0,op==='fv'?h:0);x.scale(op==='fh'?-1:1,op==='fv'?-1:1);x.drawImage(IC,0,0)}
+else{c=IC;const x=c.getContext('2d'),d=x.getImageData(0,0,w,h),p=d.data;for(let i=0;i<p.length;i+=4){if(op==='g'){const v=.299*p[i]+.587*p[i+1]+.114*p[i+2];p[i]=p[i+1]=p[i+2]=v}else{p[i]=255-p[i];p[i+1]=255-p[i+1];p[i+2]=255-p[i+2]}}x.putImageData(d,0,0)}
+IC=c;showImg()}
+async function exportImg(){if(!IC)return err('imgOut','اختر صورة أولًا');try{
+const f=$('#imgFmt').value,q=+$('#imgQ').value,mw=+$('#imgW').value;let c=IC;
+if(mw&&c.width>mw){const r=document.createElement('canvas');r.width=mw;r.height=Math.round(c.height*mw/c.width);r.getContext('2d').drawImage(c,0,0,r.width,r.height);c=r}
+const flat=()=>{const r=document.createElement('canvas');r.width=c.width;r.height=c.height;const x=r.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,r.width,r.height);x.drawImage(c,0,0);return r};
+let b;
+if(f==='bmp')b=toBMP(flat());
+else if(f==='ico')b=await toICO(c);
+else{if(f==='image/jpeg')c=flat();b=await new Promise(r=>c.toBlob(r,f,q))}
+if(!b)throw new Error('المتصفح لا يدعم هذه الصيغة للتصدير');
+const ext=b.type==='image/jpeg'?'jpg':b.type==='image/x-icon'?'ico':b.type.split('/')[1];
+const note=f.startsWith('image/')&&b.type!==f?'<p class="bad">هذا المتصفح لا يصدّر هذه الصيغة، لذلك تم استخدام PNG.</p>':'';
+save(b,IN+'.'+ext);
+out('imgOut',`${note}<p>تم التحويل: ${fmt(b.size)}${IS?` · توفير ${Math.max(0,Math.round((1-b.size/IS)*100))}%`:''}</p>`)
+}catch(e){err('imgOut',e)}}
+function toBMP(c){const w=c.width,h=c.height,p=c.getContext('2d').getImageData(0,0,w,h).data,row=(w*3+3)&~3,sz=54+row*h,v=new DataView(new ArrayBuffer(sz)),u=new Uint8Array(v.buffer);
+v.setUint16(0,0x4D42,true);v.setUint32(2,sz,true);v.setUint32(10,54,true);v.setUint32(14,40,true);v.setInt32(18,w,true);v.setInt32(22,h,true);v.setUint16(26,1,true);v.setUint16(28,24,true);v.setUint32(34,row*h,true);
+for(let y=0;y<h;y++)for(let x=0;x<w;x++){const s=(y*w+x)*4,d=54+(h-1-y)*row+x*3;u[d]=p[s+2];u[d+1]=p[s+1];u[d+2]=p[s]}
+return new Blob([u],{type:'image/bmp'})}
+async function toICO(c){const r=document.createElement('canvas');r.width=r.height=256;const x=r.getContext('2d'),k=Math.min(256/c.width,256/c.height);x.drawImage(c,(256-c.width*k)/2,(256-c.height*k)/2,c.width*k,c.height*k);const png=new Uint8Array(await (await new Promise(res=>r.toBlob(res,'image/png'))).arrayBuffer());const v=new DataView(new ArrayBuffer(22));v.setUint16(2,1,true);v.setUint16(4,1,true);v.setUint16(10,1,true);v.setUint16(12,32,true);v.setUint32(14,png.length,true);v.setUint32(18,22,true);return new Blob([v,png],{type:'image/x-icon'})}
+
+/* ---------- PDF ---------- */
+async function runPdf(k){try{
+if(k==='img'){const fs=F.pdfimg||[];if(!fs.length)throw new Error('اختر صورة واحدة على الأقل');await lib(PL);const d=await PDFLib.PDFDocument.create();
+for(const f of fs){let im;const b=new Uint8Array(await f.arrayBuffer());
+try{im=f.type==='image/png'?await d.embedPng(b):await d.embedJpg(b)}catch{const c=await loadImg(f),x=document.createElement('canvas');x.width=c.width;x.height=c.height;const g=x.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,x.width,x.height);g.drawImage(c,0,0);im=await d.embedJpg(new Uint8Array(await (await new Promise(r=>x.toBlob(r,'image/jpeg',.92))).arrayBuffer()))}
+d.addPage([im.width,im.height]).drawImage(im,{x:0,y:0,width:im.width,height:im.height})}
+save(new Blob([await d.save()],{type:'application/pdf'}),'images.pdf');out('pdfOut',`<p>تم إنشاء PDF من ${fs.length} صورة.</p>`)}
+else if(k==='merge'){const fs=F.pdfmerge||[];if(!fs.length)throw new Error('اختر ملفات PDF للدمج');await lib(PL);const o=await PDFLib.PDFDocument.create();
+for(const f of fs){const s=await PDFLib.PDFDocument.load(await f.arrayBuffer());(await o.copyPages(s,s.getPageIndices())).forEach(p=>o.addPage(p))}
+save(new Blob([await o.save()],{type:'application/pdf'}),'merged.pdf');out('pdfOut',`<p>تم دمج ${fs.length} ملف في PDF واحد.</p>`)}
+else{const f=(F.pdfsplit||[])[0];if(!f)throw new Error('اختر ملف PDF');await lib(PJ);await lib(PJW);await lib(JZ);pdfjsLib.GlobalWorkerOptions.workerSrc=PJW;
+const doc=await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise,z=new JSZip();
+for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i),vp=pg.getViewport({scale:2}),c=document.createElement('canvas');c.width=Math.floor(vp.width);c.height=Math.floor(vp.height);await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;z.file(`page-${i}.png`,await new Promise(r=>c.toBlob(r,'image/png')));out('pdfOut',`جارٍ التحويل: ${i} من ${doc.numPages}`)}
+save(await z.generateAsync({type:'blob'}),'pdf-pages.zip');out('pdfOut',`<p>تم تحويل ${doc.numPages} صفحة إلى PNG داخل ملف ZIP.</p>`)}
+}catch(e){err('pdfOut',e)}}
+
+/* ---------- ZIP ---------- */
+async function runZip(k){try{await lib(JZ);
+if(k==='pack'){const fs=F.zipin||[];if(!fs.length)throw new Error('اختر ملفات للضغط');const z=new JSZip();fs.forEach(f=>z.file(f.name,f));const b=await z.generateAsync({type:'blob',compression:'DEFLATE'});save(b,'archive.zip');out('zOut',`<p>تم إنشاء الأرشيف: ${fs.length} ملف · ${fmt(b.size)}</p>`)}
+else{const f=(F.unzip||[])[0];if(!f)throw new Error('اختر ملف ZIP');ZZ=await JSZip.loadAsync(f);const names=Object.keys(ZZ.files).filter(n=>!ZZ.files[n].dir);
+out('zOut',names.length?`<p>${names.length} ملف داخل الأرشيف:</p>`+names.map(n=>`<button class="chip" data-n="${esc(n)}" onclick="unz(this.dataset.n)">${esc(n)}</button>`).join(''):'<p>الأرشيف فارغ.</p>')}
+}catch(e){err('zOut',e)}}
+async function unz(n){const b=await ZZ.file(n).async('blob');save(b,n.split('/').pop())}
+
+/* ---------- الصوت ---------- */
+async function runMedia(){try{const f=(F.media||[])[0];if(!f)throw new Error('اختر ملفًا صوتيًا أو فيديو');out('mOut','<p>جارٍ قراءة الملف…</p>');
+const ac=new(window.AudioContext||window.webkitAudioContext)(),buf=await ac.decodeAudioData(await f.arrayBuffer());ac.close();
+const ch=Math.min(2,buf.numberOfChannels);let b;
+if($('#mFmt').value==='wav')b=toWav(buf,ch);else{await lib(LJ);b=toMp3(buf,ch,+$('#mBr').value)}
+save(b,f.name.replace(/\.[^.]+$/,'')+'.'+$('#mFmt').value);
+out('mOut',`<p>المدة: ${buf.duration.toFixed(1)} ثانية · ${ch===2?'ستيريو':'مونو'} · ${buf.sampleRate} Hz · ${fmt(b.size)}</p>`)
+}catch(e){err('mOut',/decode/i.test(e.message)||e.name==='EncodingError'?'تعذر فك ترميز هذا الملف في المتصفح، جرّب MP4 بصوت AAC أو MP3 أو WAV':e)}}
+function toWav(b,ch){const n=b.length,sr=b.sampleRate,bytes=n*ch*2,v=new DataView(new ArrayBuffer(44+bytes));let o=0;
+const s=t=>{for(const c of t)v.setUint8(o++,c.charCodeAt(0))},u16=x=>{v.setUint16(o,x,true);o+=2},u32=x=>{v.setUint32(o,x,true);o+=4};
+s('RIFF');u32(36+bytes);s('WAVE');s('fmt ');u32(16);u16(1);u16(ch);u32(sr);u32(sr*ch*2);u16(ch*2);u16(16);s('data');u32(bytes);
+const d=[];for(let c=0;c<ch;c++)d.push(b.getChannelData(c));
+for(let i=0;i<n;i++)for(let c=0;c<ch;c++){const x=Math.max(-1,Math.min(1,d[c][i]));v.setInt16(o,x<0?x*32768:x*32767,true);o+=2}
+return new Blob([v],{type:'audio/wav'})}
+function toMp3(b,ch,kbps){const e=new lamejs.Mp3Encoder(ch,b.sampleRate,kbps),i16=x=>{const o=new Int16Array(x.length);for(let i=0;i<x.length;i++){const s=Math.max(-1,Math.min(1,x[i]));o[i]=s<0?s*32768:s*32767}return o},
+L=i16(b.getChannelData(0)),R=ch>1?i16(b.getChannelData(1)):null,parts=[];
+for(let i=0;i<L.length;i+=1152){const a=ch>1?e.encodeBuffer(L.subarray(i,i+1152),R.subarray(i,i+1152)):e.encodeBuffer(L.subarray(i,i+1152));if(a.length)parts.push(a)}
+const t=e.flush();if(t.length)parts.push(t);return new Blob(parts,{type:'audio/mpeg'})}
+
+/* ---------- كلام ونص ---------- */
+function speak(){const t=$('#ttsIn').value.trim();if(!t)return err('vOut','اكتب نصًا أولًا');const u=new SpeechSynthesisUtterance(t),l=$('#ttsLang').value;u.lang=l;u.rate=+$('#ttsRate').value;
+const v=speechSynthesis.getVoices().find(x=>x.lang.replace('_','-').startsWith(l.slice(0,2)));if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u);out('vOut','<p>جارٍ التشغيل…</p>')}
+function mic(){const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return err('vOut','هذا المتصفح لا يدعم التعرف على الكلام، جرّب Chrome أو Edge');
+if(rec){rec.stop();return}
+rec=new R();rec.lang=$('#sttLang').value;rec.continuous=true;rec.interimResults=true;const base=$('#sttOut').value;
+rec.onresult=e=>{let s='';for(let i=0;i<e.results.length;i++)s+=e.results[i][0].transcript;$('#sttOut').value=(base?base+' ':'')+s};
+rec.onerror=e=>err('vOut','خطأ في الميكروفون: '+e.error);
+rec.onend=()=>{rec=null;$('#micBtn').textContent='بدء الاستماع'};
+rec.start();$('#micBtn').textContent='إيقاف'}
+
+/* ---------- نصوص وترجمة ---------- */
+function textFile(){const t=$('#docIn').value;if(!t.trim())return err('docOut','اكتب نصًا أولًا');const f=$('#docFmt').value,n=($('#docName').value.trim()||'مستند').replace(/[\\/:*?"<>|]/g,'_');
+if(f==='json'){try{JSON.parse(t)}catch{return err('docOut','النص ليس JSON صحيحًا')}}
+const m={txt:'text/plain',md:'text/markdown',csv:'text/csv',json:'application/json',html:'text/html'}[f];
+const body=f==='html'?`<!doctype html><meta charset="utf-8"><title>${esc(n)}</title><pre style="white-space:pre-wrap;font-family:inherit">${esc(t)}</pre>`:t;
+save(new Blob([body],{type:m+';charset=utf-8'}),n+'.'+f);out('docOut',`<p>تم إنشاء ${esc(n)}.${f}</p>`)}
+function points(){const s=$('#docIn').value.split(/[.!?؟\n]+/).map(x=>x.trim()).filter(x=>x.length>3).slice(0,15);if(!s.length)return err('docOut','اكتب نصًا أولًا');
+out('docOut','<h3>نقاط للمراجعة</h3><ol>'+s.map(x=>`<li>${esc(x)}</li>`).join('')+'</ol><p class="d">تقسيم نصي على الجمل، وليس تلخيصًا ذكيًا.</p>')}
+function textImg(){const t=$('#posIn').value.trim();if(!t)return err('docOut','اكتب النص أولًا');const [W,H]=$('#posSize').value.split(',').map(Number),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+x.fillStyle=$('#posBg').value;x.fillRect(0,0,W,H);x.fillStyle=$('#posFg').value;x.textAlign='center';x.textBaseline='middle';
+const fs=Math.round(Math.min(W,H)/11);x.font=`700 ${fs}px "Readex Pro",sans-serif`;const mw=W*.8,lines=[];
+t.split('\n').forEach(p=>{let l='';p.split(' ').forEach(w=>{const n=l?l+' '+w:w;if(x.measureText(n).width>mw&&l){lines.push(l);l=w}else l=n});lines.push(l)});
+const lh=fs*1.35,y0=H/2-(lines.length-1)*lh/2;lines.forEach((l,i)=>x.fillText(l,W/2,y0+i*lh));
+c.toBlob(b=>save(b,'poster.png'),'image/png')}
+async function trans(){try{const t=$('#trIn').value.trim();if(!t)throw new Error('اكتب النص أولًا');if(!('Translator' in self))throw new Error('ميزة الترجمة المدمجة متاحة في Chrome الحديث فقط');
+const a=$('#trFrom').value.slice(0,2),b=$('#trTo').value.slice(0,2);out('trOut','<p>جارٍ الترجمة…</p>');
+const tr=await Translator.create({sourceLanguage:a,targetLanguage:b});out('trOut',`<p>${esc(await tr.translate(t))}</p>`)}catch(e){err('trOut',e)}}
+/* ---------- تحرير الصور ---------- */
+let HS=[];
+const cp=c=>{const r=document.createElement('canvas');r.width=c.width;r.height=c.height;r.getContext('2d').drawImage(c,0,0);return r};
+function hist(){if(!IC)return;HS.push(cp(IC));if(HS.length>5)HS.shift()}
+function undo(){if(!HS.length)return err('imgOut','لا توجد خطوات للتراجع');IC=HS.pop();showImg()}
+function adj(fn){if(!IC)return err('imgOut','اختر صورة أولًا');hist();const x=IC.getContext('2d'),d=x.getImageData(0,0,IC.width,IC.height),p=d.data,c=v=>v<0?0:v>255?255:v;for(let i=0;i<p.length;i+=4){const[r,g,b]=fn(p[i],p[i+1],p[i+2]);p[i]=c(r);p[i+1]=c(g);p[i+2]=c(b)}x.putImageData(d,0,0);showImg()}
+function applyAdj(){const B=+$('#fB').value,C=+$('#fC').value,S=+$('#fS').value;adj((r,g,b)=>{const R=((r-128)*C+128)*B,G=((g-128)*C+128)*B,Q=((b-128)*C+128)*B,y=.299*R+.587*G+.114*Q;return[y+(R-y)*S,y+(G-y)*S,y+(Q-y)*S]})}
+function blurIt(){if(!IC)return;hist();const w=IC.width,h=IC.height,s=document.createElement('canvas');s.width=Math.max(1,w>>2);s.height=Math.max(1,h>>2);s.getContext('2d').drawImage(IC,0,0,s.width,s.height);const g=IC.getContext('2d');g.clearRect(0,0,w,h);g.imageSmoothingQuality='high';g.drawImage(s,0,0,w,h);showImg()}
+function sharp(){if(!IC)return;hist();const w=IC.width,h=IC.height,x=IC.getContext('2d'),p=x.getImageData(0,0,w,h).data,o=x.createImageData(w,h),q=o.data,K=[0,-1,0,-1,5,-1,0,-1,0];q.set(p);for(let y=1;y<h-1;y++)for(let i=1;i<w-1;i++){const j=(y*w+i)*4;for(let c=0;c<3;c++){let v=0,k=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++,k++)v+=K[k]*p[((y+dy)*w+i+dx)*4+c];q[j+c]=v<0?0:v>255?255:v}}x.putImageData(o,0,0);showImg()}
+function txt(){const t=$('#wm').value.trim();if(!IC||!t)return err('imgOut','اختر صورة واكتب النص أولًا');hist();const x=IC.getContext('2d'),fs=Math.max(12,Math.round(IC.width/14)),y=IC.height-fs/3;x.font=`700 ${fs}px 'Readex Pro',sans-serif`;x.textAlign='center';x.textBaseline='bottom';x.lineWidth=fs/9;x.strokeStyle='rgba(0,0,0,.65)';x.fillStyle='#fff';x.strokeText(t,IC.width/2,y);x.fillText(t,IC.width/2,y);showImg()}
+function round(){if(!IC)return;if(!document.createElement('canvas').getContext('2d').roundRect)return err('imgOut','هذا المتصفح لا يدعم الزوايا الدائرية');hist();const r=Math.min(IC.width,IC.height)*.12,c=document.createElement('canvas');c.width=IC.width;c.height=IC.height;const x=c.getContext('2d');x.beginPath();x.roundRect(0,0,c.width,c.height,r);x.clip();x.drawImage(IC,0,0);IC=c;showImg()}
+function crop(){if(!IC)return;const a=$('#cropR').value;if(!a)return err('imgOut','اختر نسبة القص أولًا');hist();const[rw,rh]=a.split(':').map(Number),w=IC.width,h=IC.height;let cw=w,ch=w*rh/rw;if(ch>h){ch=h;cw=h*rw/rh}cw=Math.round(cw);ch=Math.round(ch);const c=document.createElement('canvas');c.width=cw;c.height=ch;c.getContext('2d').drawImage(IC,Math.round((w-cw)/2),Math.round((h-ch)/2),cw,ch,0,0,cw,ch);IC=c;showImg()}
+/* ---------- فيديو وGIF وتوليد الصور ---------- */
+let VREC=null;const ev=n=>Math.max(2,Math.round(n/2)*2),fit=(x,im,W,H)=>{x.fillStyle='#000';x.fillRect(0,0,W,H);const k=Math.min(W/im.width,H/im.height);x.drawImage(im,(W-im.width*k)/2,(H-im.height*k)/2,im.width*k,im.height*k)};
+const pickType=()=>['video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';
+const msgOf=e=>e.name==='NotSupportedError'?'صيغة هذا الملف غير مدعومة في المتصفح، جرّب MP4 أو WEBM':e.name==='NotAllowedError'?'اضغط زر التحويل مرة أخرى':e;
+const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const gv=()=>runGif('vid'),gi=()=>runGif('imgs');
+function vStop(){if(VREC&&VREC.state!=='inactive')VREC.stop()}
+async function vidMp4(){const f=(F.vid||[])[0];if(!f)throw new Error('اختر ملف فيديو');const v=document.createElement('video');v.playsInline=true;v.src=URL.createObjectURL(f);const ac=new(window.AudioContext||window.webkitAudioContext)(),dst=ac.createMediaStreamDestination();ac.createMediaElementSource(v).connect(dst);await v.play();const k=Math.min(1,720/v.videoHeight),c=document.createElement('canvas');c.width=ev(v.videoWidth*k);c.height=ev(v.videoHeight*k);const x=c.getContext('2d'),mt=pickType(),R=new MediaRecorder(new MediaStream([...c.captureStream(30).getVideoTracks(),...dst.stream.getAudioTracks()]),mt?{mimeType:mt}:{}),parts=[],done=new Promise(r=>R.onstop=r);R.ondataavailable=e=>{if(e.data.size)parts.push(e.data)};VREC=R;const tick=()=>{x.drawImage(v,0,0,c.width,c.height);out('vidOut',`<p>جارٍ التحويل: ${Math.round(v.currentTime/v.duration*100)}%</p>`);if(R.state!=='inactive')requestAnimationFrame(tick)};v.onended=vStop;R.start(1000);tick();await done;ac.close();return new Blob(parts,{type:(mt||'video/webm').split(';')[0]})}
+async function runVid(){try{out('vidOut','<p>جارٍ التحويل…</p>');const b=await vidMp4();const ext=b.type.includes('mp4')?'mp4':'webm';save(b,'video.'+ext);out('vidOut',`<p>تم التحويل إلى ${ext.toUpperCase()}${ext==='webm'?'، لأن متصفحك لا يسجّل MP4 مباشرة':''} · ${fmt(b.size)}</p>`)}catch(e){err('vidOut',msgOf(e))}}
+async function vidGif(){const f=(F.vid||[])[0];if(!f)throw new Error('اختر ملف فيديو');const v=document.createElement('video');v.muted=true;v.preload='auto';v.src=URL.createObjectURL(f);await new Promise((res,rej)=>{v.onloadeddata=res;v.onerror=()=>rej(new Error('تعذر قراءة الفيديو في المتصفح'))});const fps=+$('#gFps').value,W=+$('#gW').value,H=Math.round(W*v.videoHeight/v.videoWidth),n=Math.min(Math.floor(v.duration*fps),150);if(!n)throw new Error('الفيديو قصير جدًا');const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true}),frames=[];for(let i=0;i<n;i++){if(i){const p=new Promise(r=>v.addEventListener('seeked',r,{once:true}));v.currentTime=i/fps;await p}x.drawImage(v,0,0,W,H);frames.push(quant(x.getImageData(0,0,W,H).data,W,H));out('vidOut',`جارٍ الاستخراج: ${i+1} من ${n}`)}return gifBlob(frames,W,H,Math.round(100/fps))}
+async function runGif(k){try{out('vidOut','<p>جارٍ إنشاء GIF…</p>');let b;if(k==='vid')b=await vidGif();else{const fs=F.gimgs||[];if(!fs.length)throw new Error('اختر صورًا أولًا');const cs=await Promise.all(fs.map(loadImg)),W=ev(cs[0].width),H=ev(cs[0].height),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');b=gifBlob(cs.map(im=>{fit(x,im,W,H);return quant(x.getImageData(0,0,W,H).data,W,H)}),W,H,Math.round(100/+$('#gFps').value))}save(b,'animation.gif');out('vidOut',`<p>تم إنشاء GIF · ${fmt(b.size)}</p>`)}catch(e){err('vidOut',e)}}
+async function runSlides(){try{const fs=F.gimgs||[];if(!fs.length)throw new Error('اختر صورًا أولًا');out('vidOut','<p>جارٍ إنشاء الفيديو، كل صورة تظهر ثانيتين…</p>');const cs=await Promise.all(fs.map(loadImg)),W=ev(cs[0].width),H=ev(cs[0].height),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),mt=pickType(),R=new MediaRecorder(c.captureStream(30),mt?{mimeType:mt}:{}),parts=[],done=new Promise(r=>R.onstop=r);VREC=R;R.ondataavailable=e=>{if(e.data.size)parts.push(e.data)};R.start(1000);for(const im of cs){const t0=Date.now();while(Date.now()-t0<2000){fit(x,im,W,H);await new Promise(r=>setTimeout(r,33))}}R.stop();await done;const b=new Blob(parts,{type:(mt||'video/webm').split(';')[0]}),ext=b.type.includes('mp4')?'mp4':'webm';save(b,'slides.'+ext);out('vidOut',`<p>تم إنشاء ${ext.toUpperCase()} · ${fmt(b.size)}</p>`)}catch(e){err('vidOut',msgOf(e))}}
+function quant(d,w,h){const o=new Uint8Array(w*h),q=v=>v<0?0:v>255?255:v;for(let i=0;i<w*h;i++){const t=(BAY[((i/w|0)&3)*4+(i%w&3)]/16-.5)*32,r=q(d[i*4]+t),g=q(d[i*4+1]+t),b=q(d[i*4+2]+t);o[i]=(Math.round(r/51)*7+Math.round(g/42.5))*6+Math.round(b/51)}return o}
+function lzw(a,m){const clr=1<<m,eoi=clr+1,ob=[];let cs=m+1,nx=eoi+1,acc=0,nb=0,dict=new Map();const emit=c=>{acc|=c<<nb;nb+=cs;while(nb>=8){ob.push(acc&255);acc>>>=8;nb-=8}if(nx>(1<<cs)-1&&cs<12)cs++};emit(clr);let p=a[0];for(let i=1;i<a.length;i++){const k=a[i],key=p*256+k,g=dict.get(key);if(g!==undefined){p=g;continue}emit(p);if(nx<4096)dict.set(key,nx++);else{emit(clr);dict=new Map();nx=eoi+1;cs=m+1}p=k}emit(p);emit(eoi);if(nb>0)ob.push(acc&255);return Uint8Array.from(ob)}
+function gifBlob(frames,W,H,delay){const P=[],b=(...a)=>P.push(new Uint8Array(a)),s=t=>[...t].map(c=>c.charCodeAt(0));const pal=[];for(let r=0;r<6;r++)for(let g=0;g<7;g++)for(let k=0;k<6;k++)pal.push(r*51,Math.round(g*42.5),k*51);while(pal.length<768)pal.push(0);b(...s('GIF89a'),W&255,W>>8,H&255,H>>8,0xF7,0,0);P.push(new Uint8Array(pal));b(0x21,0xFF,11,...s('NETSCAPE2.0'),3,1,0,0,0);for(const f of frames){b(0x21,0xF9,4,0,delay&255,delay>>8,0,0,0x2C,0,0,0,0,W&255,W>>8,H&255,H>>8,0,8);const z=lzw(f,8);for(let i=0;i<z.length;i+=255){const e=z.subarray(i,i+255);P.push(new Uint8Array([e.length]),e)}b(0)}b(0x3B);return new Blob(P,{type:'image/gif'})}
+async function genImg(){try{let u=$('#sdUrl').value.trim();while(u.endsWith('/'))u=u.slice(0,-1);const p=$('#sdP').value.trim();if(!p)throw new Error('اكتب وصف الصورة أولًا');out('sdOut','<p>جارٍ التوليد على نموذجك المحلي، وقد يستغرق ذلك دقيقة…</p>');const[W,H]=$('#sdSize').value.split(',').map(Number);const r=await fetch(u+'/sdapi/v1/txt2img',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,steps:20,width:W,height:H})});if(!r.ok)throw new Error('الخادم أرجع الخطأ '+r.status);const j=await r.json(),src='data:image/png;base64,'+j.images[0];out('sdOut',`<img class='pv' src='${src}' alt='الصورة المولدة'><p><a class='go' href='${src}' download='generated.png'>تنزيل الصورة</a></p>`)}catch(e){err('sdOut',e.message==='Failed to fetch'?'تعذر الاتصال بالخادم المحلي. شغّل WebUI بالخيارين --api و--cors-allow-origins=* ثم افتح هذا الملف على جهازك':e)}}
+function sendToAi(){$('#sdP').value=$('#sttOut').value;go('ai')}
+addEventListener('dragenter',e=>{const z=e.target.closest&&e.target.closest('.drop');if(z)z.classList.add('over')});
+addEventListener('dragleave',e=>{const z=e.target.closest&&e.target.closest('.drop');if(z)z.classList.remove('over')});
+addEventListener('drop',()=>document.querySelectorAll('.drop.over').forEach(z=>z.classList.remove('over')));
+const GR={image:['image'],media:['video','media'],docs:['pdf','zip','text'],voice:['voice','ai']},OUTS={};let OID=0;
+function show(p){const g=Object.keys(GR).find(k=>GR[k].includes(p))||'home';document.querySelectorAll('.pane').forEach(s=>s.classList.toggle('on',s.id==='p-'+p));document.querySelectorAll('#nav .tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.go===g)));const l=GR[g]||[];$('#sub').innerHTML=l.length>1?l.map(q=>`<button class='tab' data-p='${q}' aria-selected='${q===p}'>${document.querySelector('#p-'+q+' h2').textContent}</button>`).join(''):'';scrollTo(0,0)}
+function go(k){show(GR[k]?GR[k][0]:k)}
+function pipe(b,n,k,t,l){const id='o'+(++OID);OUTS[id]={b,n,k,t};return `<div class='row'><button class='chip' data-use='${id}'>${l}</button></div>`}
+function sendTo(b,n,k,t){F[k]=[new File([b],n,{type:b.type})];const el=document.querySelector(`[data-in='${k}']`),c=el&&el.closest('.drop')&&el.closest('.drop').querySelector('.cnt');if(c)c.textContent='1 ملف: '+n;show(t)}
+document.addEventListener('click',e=>{const p=e.target.closest('[data-p]');if(p){show(p.dataset.p);return}const u=e.target.closest('[data-use]');if(u){const o=OUTS[u.dataset.use];sendTo(o.b,o.n,o.k,o.t)}});
+document.addEventListener('change',e=>{if(e.target.id==='sdProv')$('#sdLocal').hidden=e.target.value!=='local'});
+const NAV=[['home','الرئيسية'],['image','الصور'],['media','الفيديو والصوت'],['docs','الملفات والنصوص'],['voice','الكلام والذكاء']];$('#nav').innerHTML=NAV.map(([k,t])=>`<button class='tab' data-go='${k}' aria-selected='${k==='home'}'>${t}</button>`).join('');$('#nav').insertAdjacentHTML('afterend','<div id=sub></div>');
+const TL=[['image','🖼️','الصور','تحويل وضغط وتحرير، وإنشاء GIF من الصور.'],['media','🎬','الفيديو والصوت','تحويل MP4 وGIF في الاتجاهين، واستخراج الصوت.'],['docs','📄','الملفات والنصوص','PDF وZIP، وتحويل النص إلى ملفات، والترجمة.'],['voice','🗣️','الكلام والذكاء','تحويل النص إلى كلام والكلام إلى نص، وتوليد الصور.']];$('#tiles').innerHTML=TL.map(([k,i,t,d])=>`<button class='tile' data-go='${k}'><span class='ico'>${i}</span><b>${t}</b><span>${d}</span></button>`).join('');
+$('#p-video').innerHTML=`<h2>الفيديو والصوت</h2><p class='d'>حوّل بين MP4 وGIF في الاتجاهين، واستخرج إطارات GIF كصور، أو صوت أي فيديو.</p><div class='box'><h3>فيديو أو GIF</h3><label class='drop'><input type='file' accept='video/*,image/gif' data-in='vid'><b>اختر فيديو أو ملف GIF</b><small>MP4 · WEBM · MOV · GIF</small><span class='cnt'></span></label><div class='row'><label>الإطارات في الثانية (GIF)<select id='gFps'><option value='5'>5</option><option value='10' selected>10</option><option value='15'>15</option></select></label><label>عرض GIF<select id='gW'><option value='240'>240 px</option><option value='360' selected>360 px</option><option value='480'>480 px</option></select></label></div><div class='row'><button class='go' onclick='runVid()'>إلى MP4</button><button class='go' onclick='gv()'>إلى GIF</button><button onclick='gf()'>GIF إلى صور (ZIP)</button><button onclick='vStop()'>إيقاف</button></div></div><div class='box'><h3>صور إلى GIF أو فيديو</h3><label class='drop'><input type='file' multiple accept='image/*' data-in='gimgs'><b>اختر الصور بالترتيب</b><span class='cnt'></span></label><div class='row'><button class='go' onclick='gi()'>إنشاء GIF</button><button onclick='runSlides()'>إنشاء فيديو (كل صورة ثانيتين)</button></div></div><div id='vidOut' class='out'></div>`;
+$('#p-ai').innerHTML=`<h2>توليد الصور</h2><p class='d'>اكتب وصفًا وتُولَّد الصورة من مصدر مفتوح. Pollinations يعمل مباشرة بلا مفتاح، وStable Diffusion على جهازك لا يحدّه إلا عتاد جهازك.</p><div class='box'><label>المصدر<select id='sdProv'><option value='pol'>Pollinations · مفتوح ويعمل مباشرة</option><option value='local'>Stable Diffusion · على جهازك</option></select></label><label id='sdLocal' hidden>عنوان الخادم المحلي<input id='sdUrl' type='text' value='http://127.0.0.1:7860' dir='ltr'></label><textarea id='sdP' placeholder='صِف الصورة التي تريدها…'></textarea><div class='row'><label>المقاس<select id='sdSize'><option value='1024,1024'>1024 × 1024</option><option value='1024,768'>1024 × 768</option><option value='768,1024'>768 × 1024</option></select></label><button class='go' onclick='genImg()'>توليد الصورة</button></div></div><div id='sdOut' class='out'></div>`;
+const cat=ps=>{const t=ps.reduce((a,q)=>a+q.length,0),r=new Uint8Array(t);let o=0;for(const q of ps){r.set(q,o);o+=q.length}return r};
+function lzwDec(d,m,n){const clr=1<<m,eoi=clr+1,pre=new Int16Array(4096),suf=new Uint8Array(4096),len=new Uint16Array(4096),out=new Uint8Array(n);for(let i=0;i<clr;i++){pre[i]=-1;suf[i]=i;len[i]=1}let cs=m+1,nx=eoi+1,prev=-1,buf=0,bits=0,pos=0,o=0;const first=c=>{while(pre[c]>=0)c=pre[c];return suf[c]};const put=c=>{const L=len[c];let k=c;for(let i=L-1;i>=0;i--){if(o+i<n)out[o+i]=suf[k];k=pre[k]}o+=L};while(o<n){while(bits<cs){if(pos>=d.length)return out;buf|=d[pos++]<<bits;bits+=8}const code=buf&((1<<cs)-1);buf>>=cs;bits-=cs;if(code===clr){cs=m+1;nx=eoi+1;prev=-1;continue}if(code===eoi)break;if(prev<0){put(code);prev=code;continue}if(code<nx){put(code);if(nx<4096){pre[nx]=prev;suf[nx]=first(code);len[nx]=len[prev]+1;nx++}}else{if(nx<4096){pre[nx]=prev;suf[nx]=first(prev);len[nx]=len[prev]+1;nx++}put(nx-1)}if(nx===(1<<cs)&&cs<12)cs++;prev=code}return out}
+function gifDec(buf){const u=new Uint8Array(buf),dv=new DataView(buf),W=dv.getUint16(6,true),H=dv.getUint16(8,true),fl=u[10],comp=new Uint8ClampedArray(W*H*4),frames=[];let p=13,gct=null,g={d:0,t:-1,dl:100},pd=0,pr=null,snap=null;if(fl&128){const n=2<<(fl&7);gct=u.subarray(p,p+n*3);p+=n*3}const rd=()=>{const ps=[];for(;;){const L=u[p++];if(!L||p>u.length)break;ps.push(u.subarray(p,p+L));p+=L}return cat(ps)};while(p<u.length){const b=u[p++];if(b===0x21){const lab=u[p++];if(lab===0xF9){const bs=u[p],pk=u[p+1];g={d:(pk>>2)&7,t:pk&1?u[p+4]:-1,dl:((u[p+2]|u[p+3]<<8)||10)*10};p+=bs+2}else rd()}else if(b===0x2C){const fx=dv.getUint16(p,true),fy=dv.getUint16(p+2,true),fw=dv.getUint16(p+4,true),fh=dv.getUint16(p+6,true),ifl=u[p+8];p+=9;let ct=gct;if(ifl&128){const n=2<<(ifl&7);ct=u.subarray(p,p+n*3);p+=n*3}const mcs=u[p++];let idx=lzwDec(rd(),mcs,fw*fh);if(ifl&64){const rows=[];for(const[s,st]of[[0,8],[4,8],[2,4],[1,2]])for(let y=s;y<fh;y+=st)rows.push(y);const d2=new Uint8Array(fw*fh);for(let r=0;r<fh;r++)d2.set(idx.subarray(r*fw,r*fw+fw),rows[r]*fw);idx=d2}if(pd===2&&pr)for(let y=pr.y;y<pr.y+pr.h&&y<H;y++)for(let x=pr.x;x<pr.x+pr.w&&x<W;x++)comp[(y*W+x)*4+3]=0;if(pd===3&&snap)comp.set(snap);snap=g.d===3?comp.slice():null;for(let y=0;y<fh;y++)for(let x=0;x<fw;x++){const c=idx[y*fw+x],cx=fx+x,cy=fy+y;if((g.t>=0&&c===g.t)||cx>=W||cy>=H||!ct||c*3+2>=ct.length)continue;const o=(cy*W+cx)*4;comp[o]=ct[c*3];comp[o+1]=ct[c*3+1];comp[o+2]=ct[c*3+2];comp[o+3]=255}frames.push({data:comp.slice(),delay:g.dl});pd=g.d;pr={x:fx,y:fy,w:fw,h:fh};g={d:0,t:-1,dl:100}}else break}return{W,H,frames}}
+async function gifMp4(f){const g=gifDec(await f.arrayBuffer());if(!g.frames.length)throw new Error('لم يُعثر على إطارات في ملف GIF');const cv=document.createElement('canvas');cv.width=g.W;cv.height=g.H;const cx=cv.getContext('2d'),c=document.createElement('canvas');c.width=ev(g.W);c.height=ev(g.H);const x=c.getContext('2d'),mt=pickType(),R=new MediaRecorder(c.captureStream(30),mt?{mimeType:mt}:{}),parts=[],done=new Promise(r=>R.onstop=r);R.ondataavailable=e=>{if(e.data.size)parts.push(e.data)};VREC=R;R.start(1000);for(let i=0;i<g.frames.length;i++){const fr=g.frames[i];cx.putImageData(new ImageData(fr.data,g.W,g.H),0,0);x.fillStyle='#000';x.fillRect(0,0,c.width,c.height);x.drawImage(cv,0,0,c.width,c.height);out('vidOut',`<p>جارٍ التحويل: ${i+1} من ${g.frames.length}</p>`);await new Promise(r=>setTimeout(r,fr.delay))}R.stop();await done;return new Blob(parts,{type:(mt||'video/webm').split(';')[0]})}
+async function gifFrames(f){const g=gifDec(await f.arrayBuffer());await lib(JZ);const cv=document.createElement('canvas');cv.width=g.W;cv.height=g.H;const cx=cv.getContext('2d'),z=new JSZip();for(let i=0;i<g.frames.length;i++){cx.putImageData(new ImageData(g.frames[i].data,g.W,g.H),0,0);z.file('frame-'+String(i+1).padStart(3,'0')+'.png',await new Promise(r=>cv.toBlob(r,'image/png')))}return z.generateAsync({type:'blob'})}
+async function gf(){try{const f=(F.vid||[])[0];if(!f||f.type!=='image/gif')throw new Error('اختر ملف GIF أولًا');out('vidOut','<p>جارٍ استخراج الإطارات…</p>');const b=await gifFrames(f);save(b,'frames.zip');out('vidOut',`<p>تم استخراج الإطارات داخل ZIP · ${fmt(b.size)}</p>`)}catch(e){err('vidOut',e)}}
+async function runVid(){try{const f=(F.vid||[])[0];if(!f)throw new Error('اختر ملف فيديو أو GIF أولًا');out('vidOut','<p>جارٍ التحويل…</p>');const isG=f.type==='image/gif',b=isG?await gifMp4(f):await vidMp4(),ext=b.type.includes('mp4')?'mp4':'webm',n='converted.'+ext;save(b,n);out('vidOut',`<p>تم التحويل إلى ${ext.toUpperCase()}${ext==='webm'?'، لأن متصفحك لا يسجّل MP4 مباشرة':''} · ${fmt(b.size)}</p>${pipe(b,n,'media','media','استخراج صوته')}`)}catch(e){err('vidOut',msgOf(e))}}
+async function runGif(k){try{const f=(F.vid||[])[0];if(k==='vid'&&f&&f.type==='image/gif')throw new Error('هذا الملف GIF بالفعل، استخدم «إلى MP4» أو «GIF إلى صور»');out('vidOut','<p>جارٍ إنشاء GIF…</p>');let b;if(k==='vid')b=await vidGif();else{const fs=F.gimgs||[];if(!fs.length)throw new Error('اختر صورًا أولًا');const cs=await Promise.all(fs.map(loadImg)),W=ev(cs[0].width),H=ev(cs[0].height),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');b=gifBlob(cs.map(im=>{fit(x,im,W,H);return quant(x.getImageData(0,0,W,H).data,W,H)}),W,H,Math.round(100/+$('#gFps').value))}save(b,'animation.gif');out('vidOut',`<p>تم إنشاء GIF · ${fmt(b.size)}</p>${pipe(b,'animation.gif','vid','video','تحويله إلى MP4')}`)}catch(e){err('vidOut',e)}}
+async function genImg(){const p=$('#sdP').value.trim();if(!p)return err('sdOut','اكتب وصف الصورة أولًا');const[W,H]=$('#sdSize').value.split(',').map(Number),prov=$('#sdProv').value;out('sdOut','<p>جارٍ التوليد، وقد يستغرق ذلك دقيقة…</p>');try{let src,dl;if(prov==='local'){let u=$('#sdUrl').value.trim();while(u.endsWith('/'))u=u.slice(0,-1);const r=await fetch(u+'/sdapi/v1/txt2img',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,steps:20,width:W,height:H})});if(!r.ok)throw new Error('الخادم أرجع الخطأ '+r.status);const j=await r.json();src='data:image/png;base64,'+j.images[0];dl=src}else{const u='https://image.pollinations.ai/prompt/'+encodeURIComponent(p)+'?width='+W+'&height='+H+'&nologo=true&seed='+Math.floor(Math.random()*1e6);const r=await fetch(u);if(!r.ok)throw new Error('الخدمة أرجعت الخطأ '+r.status);src=URL.createObjectURL(await r.blob());dl=src}out('sdOut',`<img class='pv' src='${src}' alt='الصورة المولدة'><p><a class='go' href='${dl}' download='generated-image'>تنزيل الصورة</a></p>`)}catch(e){err('sdOut',e.message==='Failed to fetch'?'تعذر الوصول إلى المصدر من هذه الصفحة المعزولة. افتح نسخة الملف المحلي moonlight-reflection-local.html على جهازك وجرّب مرة أخرى':e)}}
+/* ---------- الهوية اليابانية والمنصات ---------- */
+document.head.insertAdjacentHTML('beforeend','<meta name=theme-color content=#132457><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=انعكاس>');
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)for(let i=0;i<5;i++){const p=document.createElement('span');p.className='petal';p.style.cssText=`--s:${8+Math.random()*10}px;left:${Math.random()*100}vw;--d:${14+Math.random()*12}s;--dl:-${Math.random()*20}s;--x:${Math.random()*40-20}vw`;document.body.append(p)}
+$('#p-ai').innerHTML=`<h2>توليد الصور</h2><p class='d'>Pollinations مجاني بلا مفتاح ويعمل مباشرة. أما النماذج المفتوحة مثل FLUX على جهازك فلا حدّ لها سوى عتاد جهازك، وتعمل عبر Forge أو AUTOMATIC1111.</p><div class='box'><label>المصدر<select id='sdProv'><option value='pol'>Pollinations · مجاني بلا مفتاح</option><option value='local'>على جهازك · بلا حدود</option></select></label><label id='sdModelL'>نموذج الذكاء<select id='sdModel'><option value='openai/gpt-image-2'>GPT Image 2 · جودة عالية (الافتراضي)</option><option value='google/gemini-3.1-flash-image'>Gemini 3.1 Flash Image · متوازن</option><option value='black-forest-labs/flux.2-pro'>FLUX 2 Pro · تفاصيل واقعية</option><option value='bytedance/seedream-5.0-pro'>Seedream 5 Pro · تفاصيل دقيقة</option><option value='black-forest-labs/flux.1-schnell'>FLUX Schnell · أسرع</option></select></label><label id='sdLocal' hidden>عنوان الخادم المحلي<input id='sdUrl' type='text' value='http://127.0.0.1:7860' dir='ltr'></label><textarea id='sdP' placeholder='صِف الصورة التي تريدها…'></textarea><div class='row'><label>المقاس<select id='sdSize'><option value='1024,1024'>1024 × 1024</option><option value='1024,768'>1024 × 768</option><option value='768,1024'>768 × 1024</option></select></label><button class='go' onclick='genImg()'>توليد الصورة</button></div></div><div id='sdOut' class='out'></div>`;
+$('#p-image').insertAdjacentHTML('beforeend',`<div class='box' style='margin-top:14px'><h3>استخراج النص من الصورة (OCR)</h3><label class='drop'><input type='file' accept='image/*' data-in='ocrin'><b>اختر صورة تحتوي على نص</b><span class='cnt'></span></label><div class='row'><label>لغة النص<select id='ocrLang'><option value='ara+eng'>عربي + إنجليزي</option><option value='eng'>إنجليزي</option><option value='fra'>فرنسي</option><option value='deu'>ألماني</option><option value='jpn'>ياباني</option><option value='chi_sim'>صيني</option></select></label><button class='go' onclick='ocr()'>استخراج النص</button><button onclick='ocrTr()'>ترجمة النص</button></div><textarea id='ocrTxt' placeholder='سيظهر النص هنا…'></textarea><div id='ocrMsg' class='out'></div><small class='d'>يحتاج النسخة المحلية، لأن بيانات اللغات تُحمَّل من الإنترنت.</small></div><div class='box'><h3>لوحة الألوان</h3><label class='drop'><input type='file' accept='image/*' data-in='palin'><b>اختر صورة لاستخراج ألوانها</b><span class='cnt'></span></label><button class='go' onclick='palette()'>استخراج الألوان</button><div id='palOut' class='out'></div></div><div class='box'><h3>ضغط إلى حجم محدد</h3><div class='row'><label>الحجم الأقصى (KB)<input id='tgtKB' type='text' value='200' inputmode='numeric'></label><button class='go' onclick='tgt()'>ضغط وتنزيل</button></div><small class='d'>يستخدم الصورة المحرّرة حاليًا، ويخفض الجودة تدريجيًا حتى يبلغ الحجم المطلوب.</small></div><div class='box'><h3>علامتك المائية</h3><div class='row'><input id='wmk' type='text' placeholder='اسمك أو شعارك'><button class='go' onclick='wmark()'>إضافة على الصورة</button></div><small class='d'>لإضافة علامتك على أعمالك أنت، لتحمي حقوقك.</small></div>`);
+const TS='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+async function ocr(){try{const f=(F.ocrin||[])[0];if(!f)throw new Error('اختر صورة أولًا');out('ocrMsg','<p>جارٍ قراءة النص، وأول مرة قد تحتاج دقيقة لتحميل اللغة…</p>');await lib(TS);const w=await Tesseract.createWorker($('#ocrLang').value),r=await w.recognize(f);await w.terminate();const t=r.data.text.trim();$('#ocrTxt').value=t;out('ocrMsg',t?'<p>تم استخراج النص.</p>':'<p class=bad>لم يُعثر على نص واضح</p>')}catch(e){err('ocrMsg',e)}}
+function ocrTr(){const t=$('#ocrTxt').value.trim();if(!t)return err('ocrMsg','استخرج النص أولًا');$('#trIn').value=t;show('text');trans()}
+async function palette(){try{const f=(F.palin||[])[0];if(!f)throw new Error('اختر صورة أولًا');const im=await loadImg(f),w=Math.min(120,im.width),h=Math.max(1,Math.round(im.height*w/im.width)),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(im,0,0,w,h);const d=x.getImageData(0,0,w,h).data,m=new Map();for(let i=0;i<d.length;i+=4){if(d[i+3]<128)continue;const k=(d[i]>>5)<<6|(d[i+1]>>5)<<3|(d[i+2]>>5);m.set(k,(m.get(k)||0)+1)}const top=[...m].sort((a,b)=>b[1]-a[1]).slice(0,6);out('palOut',`<div class='pal'>${top.map(([k])=>{const hex='#'+[(k>>6)*32+16,((k>>3)&7)*32+16,(k&7)*32+16].map(v=>v.toString(16).padStart(2,'0')).join('');return `<button class='sw' style='background:${hex}' data-hex='${hex}'><span>${hex}</span></button>`}).join('')}</div><p class='d'>اضغط اللون لنسخ رمزه.</p>`)}catch(e){err('palOut',e)}}
+async function tgt(){try{if(!IC)throw new Error('اختر صورة أولًا');const lim=(+$('#tgtKB').value||200)*1024;let b=null;for(let q=.92;q>.04;q-=.06){b=await new Promise(r=>IC.toBlob(r,'image/webp',q));if(b&&b.size<=lim)break}if(!b||b.type!=='image/webp')throw new Error('المتصفح لا يدعم ضغط WEBP هنا، جرّب Chrome أو Edge');save(b,IN+'-compressed.webp');out('imgOut',`<p>الحجم النهائي: ${fmt(b.size)}${b.size>lim?' · الصورة معقدة جدًا فلم يصل الحجم للحد المطلوب':''}</p>`)}catch(e){err('imgOut',e)}}
+function wmark(){const t=$('#wmk').value.trim();if(!IC||!t)return err('imgOut','اختر صورة واكتب علامتك أولًا');hist();const x=IC.getContext('2d'),fs=Math.max(14,Math.round(IC.width/22));x.save();x.globalAlpha=.55;x.font=`600 ${fs}px 'Zen Kaku Gothic New','Readex Pro',sans-serif`;x.textAlign='right';x.textBaseline='bottom';x.fillStyle='#fff';x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=fs/4;x.fillText(t,IC.width-fs,IC.height-fs*.6);x.restore();showImg()}
+async function genImg(){const p=$('#sdP').value.trim();if(!p)return err('sdOut','اكتب وصف الصورة أولًا');const[W,H]=$('#sdSize').value.split(',').map(Number),prov=$('#sdProv').value;out('sdOut','<p>جارٍ التوليد، وقد يستغرق ذلك دقيقة…</p>');try{let src;if(prov==='local'){let u=$('#sdUrl').value.trim();while(u.endsWith('/'))u=u.slice(0,-1);const r=await fetch(u+'/sdapi/v1/txt2img',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,steps:20,width:W,height:H})});if(!r.ok)throw new Error('الخادم أرجع الخطأ '+r.status);src='data:image/png;base64,'+(await r.json()).images[0]}else{const u='https://image.pollinations.ai/prompt/'+encodeURIComponent(p)+'?width='+W+'&height='+H+'&model='+$('#sdModel').value+'&nologo=true&seed='+Math.floor(Math.random()*1e6);const r=await fetch(u);if(r.status===429)throw new Error('تجاوزت الحد المجاني المؤقت، انتظر نحو 15 ثانية ثم حاول مجددًا');if(!r.ok)throw new Error('الخدمة أرجعت الخطأ '+r.status);src=URL.createObjectURL(await r.blob())}out('sdOut',`<img class='pv' src='${src}' alt='الصورة المولدة'><p><a class='go' href='${src}' download='generated-image'>تنزيل الصورة</a></p>`)}catch(e){err('sdOut',e.message==='Failed to fetch'?'تعذر الوصول إلى المصدر من هذه الصفحة. افتح نسخة الملف المحلي moonlight-reflection-local.html على جهازك وجرّب مرة أخرى':e)}}
+document.addEventListener('change',e=>{if(e.target.id==='sdProv')$('#sdModelL').hidden=e.target.value!=='pol'});
+document.addEventListener('click',e=>{const s=e.target.closest('[data-hex]');if(s&&navigator.clipboard)navigator.clipboard.writeText(s.dataset.hex)});
+/* ---------- معاينة قبل وبعد التحويل ---------- */
+const VX=['mp4','webm','mov','mkv'],AX=['mp3','wav','m4a','ogg','flac'],IX=['gif','png','jpg','jpeg','webp','bmp','svg','ico'];
+function kindOf(n,t){const x=n.toLowerCase().split('.').pop();return t.startsWith('video')||VX.includes(x)?'v':t.startsWith('audio')||AX.includes(x)?'a':t.startsWith('image')||IX.includes(x)?'i':t==='application/pdf'||x==='pdf'?'p':'o'}
+function prevHTML(f){const u=URL.createObjectURL(f),k=kindOf(f.name,f.type||''),i=`<small class='d'>${esc(f.name)} · ${fmt(f.size)}</small>`;if(k==='v')return `<video class='pv' controls playsinline preload='metadata' src='${u}'></video>${i}`;if(k==='a')return `<audio controls preload='metadata' src='${u}' style='width:100%'></audio>${i}`;if(k==='i')return `<img class='pv' src='${u}' alt=''>${i}`;if(k==='p')return `<embed class='pv' src='${u}' type='application/pdf' style='height:360px;width:100%'>${i}`;return `<p>${i}</p>`}
+document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.in;if(!k)return;const z=e.target.closest('.drop');if(!z)return;let b=z.nextElementSibling;if(!b||!b.classList.contains('pvw')){b=document.createElement('div');b.className='pvw box';z.insertAdjacentElement('afterend',b)}const h=(F[k]||[]).slice(0,4).map(f=>prevHTML(f)).join('');b.innerHTML=h;b.hidden=!h});
+function save(b,n){const u=URL.createObjectURL(b),k=kindOf(n,b.type||''),p=document.querySelector('.pane.on');let m='';if(k==='v')m=`<video class='pv' controls playsinline src='${u}'></video>`;else if(k==='a')m=`<audio controls src='${u}' style='width:100%'></audio>`;else if(k==='i')m=`<img class='pv' src='${u}' alt=''>`;if(!p)return;p.querySelectorAll('.rescard').forEach(r=>r.remove());p.insertAdjacentHTML('beforeend',`<div class='rescard box'><h3>النتيجة</h3>${m}<p><a class='go' href='${u}' download='${esc(n)}'>تنزيل ${esc(n)}</a> <a class='chip' href='${u}' target='_blank' rel='noopener'>فتح</a> <small class='d'>${fmt(b.size)}</small></p></div>`);p.querySelector('.rescard').scrollIntoView({behavior:'smooth',block:'center'})}
+/* ---------- توليد الصور المفتوح المصدر والمجاني محليًا ---------- */
+const STY=[['anime','أنمي كلاسيكي','high quality Japanese anime illustration, polished cel shading, clean expressive lineart, beautiful color palette, coherent anatomy, detailed background, masterpiece'],['anime-portrait','بورتريه أنمي','anime character portrait, expressive detailed eyes, clean lineart, soft cinematic lighting, detailed hair, elegant composition, high quality illustration'],['anime-fantasy','أنمي خيالي','epic fantasy anime illustration, magical atmosphere, ornate costume details, dramatic lighting, rich background, polished Japanese animation art'],['chibi','تشيبّي (Chibi)','cute chibi anime character, small body, oversized expressive head, adorable clean lineart, pastel colors, polished illustration'],['manga','مانغا أبيض وأسود','Japanese manga illustration, monochrome ink, screentone shading, crisp expressive lineart, dynamic composition'],['anime-sakura','أنمي ساكورا','Japanese anime illustration, delicate cherry blossoms, soft pink petals, dreamy spring atmosphere, beautiful detailed background, clean lineart'],['anime-cyber','أنمي سايبربانك','cyberpunk anime illustration, neon city at night, vivid rim lighting, intricate futuristic details, polished cel shading'],['photo','واقعي (Photorealistic)','photorealistic, natural lighting, realistic textures, sharp focus'],['cine','سينمائي','cinematic composition, natural dramatic lighting, depth of field'],['3d','ثلاثي الأبعاد','high quality 3D render, physically based materials, global illumination'],['watercolor','ألوان مائية','watercolor painting, soft washes, paper texture'],['oil','لوحة زيتية','oil painting, expressive brush strokes, detailed composition'],['ukiyo','ukiyo-e ياباني','Japanese ukiyo-e woodblock print, balanced composition'],['sakura','ساكورا ياباني','Japanese aesthetic, cherry blossoms, moonlit night, soft pastel tones'],['sketch','رسم بالقلم','pencil sketch, clean hand-drawn lines, cross hatching'],['pixel','بكسل آرت','pixel art, crisp pixels, limited palette'],['cyber','سايبربانك','cyberpunk city, coherent architecture, cinematic neon lighting'],['logo','شعار (Vector)','minimal vector logo, clean shapes, centered composition']],SZ=[['1024,1024','1:1 مربع'],['1344,768','16:9 عرضي'],['768,1344','9:16 طولي'],['1024,768','4:3'],['768,1024','3:4']];
+$('#p-ai').innerHTML=`<h2>توليد صور الأنمي</h2><p class='d'>توليد أنمي عبر AnimeAPI Demo. مجاني حتى 3 صور يوميًا لكل عنوان IP، ولا يحتاج مفتاح API. يعمل عبر خادم Render حتى تظهر الصورة داخل التطبيق.</p><div class='box'><label>عنوان خدمة التوليد (الخادم)<input id='sdBackend' type='url' value='https://asls.onrender.com' dir='ltr' placeholder='http://عنوان-الخادم:8000'></label><p class='d'>الخادم المتصل: https://asls.onrender.com — الحد المجاني 3 صور يوميًا لكل عنوان IP، وقد يتغير حسب سياسة المصدر.</p><label>مصدر التوليد<select id='sdProv'><option value='animeapi'>AnimeAPI · مجاني 3 صور يوميًا</option></select></label><label>وصف الصورة<textarea id='sdP' placeholder='مثال: فتاة أنمي بشعر فضي وعيون زرقاء تحت ضوء القمر…'></textarea></label><label>النمط<select id='sdStyle'>${STY.map(s=>`<option value='${s[0]}'>${s[1]}</option>`).join('')}</select></label><label>الوصف السلبي (اختياري)<textarea id='sdNeg' placeholder='مثال: blurry, low quality, extra fingers, text, watermark'></textarea></label><div class='row'><label>المقاس<select id='sdSize'><option value='512,512'>512 × 512</option><option value='768,768'>768 × 768</option><option value='512,768'>512 × 768 طولي</option><option value='768,512'>768 × 512 عرضي</option></select></label><label>البذرة (اختياري)<input id='sdSeed' type='number' placeholder='عشوائي' inputmode='numeric'></label></div><label>قوة التوجيه: <strong id='sdGuideVal'>7</strong><input id='sdGuide' type='range' min='1' max='30' step='1' value='7' oninput="document.getElementById('sdGuideVal').textContent=this.value"></label><label class='check'><input id='sdRemoveBg' type='checkbox'> إزالة الخلفية</label><button class='go' id='sdGenerateBtn' onclick='genImg()'>توليد الصورة</button><div id='sdOut' class='out' aria-live='polite'></div></div>`;
+let perchanceWarmupPromise=null;
+function warmupPerchance(){if(perchanceWarmupPromise)return perchanceWarmupPromise;perchanceWarmupPromise=new Promise(resolve=>{let f,done=false,settleTimer;const finish=()=>{if(done)return;done=true;clearTimeout(timer);clearTimeout(settleTimer);if(f)f.remove();resolve(true)};const timer=setTimeout(finish,10000);try{f=document.createElement('iframe');f.title='تهيئة اتصال Perchance';f.setAttribute('aria-hidden','true');f.tabIndex=-1;f.style.cssText='position:fixed;width:1px;height:1px;left:-10000px;top:-10000px;border:0;opacity:0;pointer-events:none';f.onload=()=>{settleTimer=setTimeout(finish,1800)};f.onerror=()=>{settleTimer=setTimeout(finish,700)};f.src='https://perchance.org/';document.body.appendChild(f)}catch(_){finish()}});return perchanceWarmupPromise}
+async function generatePerchanceImage(prompt,options){await warmupPerchance();return new Promise((resolve,reject)=>{const id='ml'+Date.now().toString(36)+Math.random().toString(36).slice(2,10);let frame,done=false;const finish=(v,bad=false)=>{if(done)return;done=true;clearTimeout(timer);window.removeEventListener('message',onMessage);if(frame)frame.remove();bad?reject(v instanceof Error?v:new Error(String(v||'تعذر توليد الصورة من Perchance.'))):resolve(v)};const timer=setTimeout(()=>finish(new Error('لم يصل رد من Perchance خلال 60 ثانية. قد يمنع ZIP الإطارات الخارجية أو رسائل postMessage. هذا فشل اتصال وليس صورة قيد التوليد.'),true),60000);function onMessage(e){const d=e.data||{};if(e.origin!=='https://perchance.org'&&!String(e.origin||'').endsWith('.perchance.org'))return;if(d.api!=='perchance-image-api'||!d.result||d.result.id!==id)return;if(d.result.ok&&(d.result.url||d.result.dataUrl))finish(d.result,false);else finish(new Error(d.result.error||'Perchance رفضت الطلب أو تعذر التوليد.'),true)}try{window.addEventListener('message',onMessage);frame=document.createElement('iframe');frame.title='خدمة توليد الصور';frame.setAttribute('aria-hidden','true');frame.style.cssText='position:absolute;width:1px;height:1px;left:-10000px;top:-10000px;border:0';const params=new URLSearchParams({prompt,format:'json',id,resolution:options.resolution,seed:String(options.seed)});if(options.negativePrompt)params.set('negativePrompt',options.negativePrompt);if(Number.isFinite(Number(options.guidanceScale)))params.set('guidanceScale',String(Math.min(30,Math.max(1,Number(options.guidanceScale)))));if(options.removeBackground)params.set('removeBackground','true');frame.style.cssText='position:fixed;width:2px;height:2px;right:0;bottom:0;border:0;opacity:0.01;pointer-events:none';frame.src='https://perchance.org/perchance-ai-api?'+params.toString();document.body.appendChild(frame)}catch(e){finish(e,true)}})}
+function testImageUrl(url,timeoutMs=45000){return new Promise((resolve,reject)=>{if(typeof url!=='string'||(!url.startsWith('data:image/')&&!/^https?:\/\//i.test(url))){reject(new Error('وصل رد لكن رابط الصورة غير صالح.'));return}const im=new Image();let done=false;const timer=setTimeout(()=>finish(new Error('وصل رابط الصورة لكن تحميلها انتهت مهلته.')),timeoutMs);function finish(e){if(done)return;done=true;clearTimeout(timer);im.onload=im.onerror=null;e?reject(e):resolve(url)}im.onload=()=>{if(im.naturalWidth>0&&im.naturalHeight>0)finish();else finish(new Error('الصورة وصلت لكن أبعادها غير صالحة.'))};im.onerror=()=>finish(new Error('وصل رابط الصورة لكن ZIP/المتصفح لم يستطع تحميلها.'));im.src=url})}
+async function genImg(){const btn=$('#sdGenerateBtn'),p=$('#sdP').value.trim();if(!p)return err('sdOut','اكتب وصف الصورة أولًا.');if(btn.disabled)return;btn.disabled=true;const original=btn.textContent;const[W,H]=$('#sdSize').value.split(',').map(Number);const st=STY.find(s=>s[0]===$('#sdStyle').value);const stylePrompt=st?st[2]:'high quality Japanese anime illustration';const negativePrompt=$('#sdNeg').value.trim();const seed=$('#sdSeed').value.trim();const guidanceScale=Number($('#sdGuide').value)||7;const removeBackground=$('#sdRemoveBg').checked;const backend=($('#sdBackend')?.value||'https://asls.onrender.com').trim().replace(/\/$/,'');const showStatus=t=>out('sdOut',`<p>${t}</p><p class="d">لا تغلق الصفحة أثناء المحاولة.</p>`);try{showStatus('جارٍ الاتصال بمصدر AnimeAPI المجاني…');let response;try{response=await fetch(backend+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p+', '+stylePrompt+(negativePrompt?', Negative prompt: '+negativePrompt:''),resolution:W+'x'+H,seed:seed||null,guidance_scale:guidanceScale,remove_background:removeBackground,timeout:180}),signal:AbortSignal.timeout(190000)})}catch(netErr){throw new Error('تعذر الوصول إلى خادم Render. تأكد من نشر ملفات AnimeAPI الجديدة وأن الخدمة بحالة Live.')}let data;try{data=await response.json()}catch(_){throw new Error('الخادم أعاد ردًا غير مفهوم.')}if(!response.ok)throw new Error(data.detail||data.error||('خطأ الخادم '+response.status));const src=data.image||data.images?.[0]||data.data?.[0]?.url||(data.data?.[0]?.b64_json?'data:image/png;base64,'+data.data[0].b64_json:null);if(!src)throw new Error('وصل رد من الخادم لكنه لا يحتوي على صورة.');showStatus('وصلت النتيجة، جارٍ التحقق من الصورة…');await testImageUrl(src,30000);out('sdOut',`<p>تم استلام الصورة.</p><img class="pv" src="${src}" alt="الصورة المولدة"><p><a class="go" href="${src}" download="moonlight-anime.png" target="_blank" rel="noopener">فتح/حفظ الصورة</a></p><p class="d">المقاس: ${W}×${H} · البذرة: ${esc(seed||'عشوائية')}</p>`)}catch(e){err('sdOut',(e&&e.message)||'تعذر توليد الصورة.')}finally{btn.disabled=false;btn.textContent=original}}
+/* ---------- التنزيل من داخل الصفحة المنشورة ---------- */
+const DL={};let DLI=0;
+const DLMSG={declined:'لم تُحفظ الملف لأنك لم توافق على الحفظ.',rejected_extension:'صيغة هذا الملف لا تُحفظ من داخل المعاينة، افتح النسخة المحلية لتنزيله.',extension_not_enabled:'هذه الصيغة غير متاحة للحفظ هنا، افتح النسخة المحلية.',too_large:'الملف كبير جدًا للحفظ من داخل المعاينة، افتح النسخة المحلية.',rate_limited:'هناك طلب حفظ مفتوح بالفعل، أغلقه ثم حاول مجددًا.',bad_request:'تعذر تجهيز الملف للحفظ، جرّب التحويل مرة أخرى.'};
+async function dlFile(id){const o=DL[id],st=document.getElementById('dls'+id),say=t=>{if(st)st.textContent=t};if(!o)return;try{if(window.claude&&typeof window.claude.use==='function'){const d=await window.claude.use('downloads');if(d){say('بانتظار موافقتك على الحفظ…');await d.save({filename:o.n,data:o.b});say('تم الحفظ.');return}}
+/* iPhone/iPad Safari may open a media Blob instead of downloading it. Use the native share sheet so the user can choose Save to Files. */
+const f=new File([o.b],o.n,{type:o.b.type||'application/octet-stream'});if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){say('اختر «حفظ في الملفات» من قائمة المشاركة لحفظ الملف على جهازك.');await navigator.share({files:[f],title:o.n});say('اكتملت المشاركة أو الحفظ.');return}
+const u=URL.createObjectURL(o.b),a=document.createElement('a');a.href=u;a.download=o.n;a.rel='noopener';a.style.display='inline-block';a.textContent='اضغط هنا لتنزيل الملف';a.className='go';a.removeAttribute('target');if(st){st.replaceChildren(a);say('اضغط رابط التنزيل. إذا فتح المقطع بدل تنزيله، استخدم مشاركة ثم «حفظ في الملفات».')}else{document.body.append(a);a.click()}setTimeout(()=>URL.revokeObjectURL(u),60000)}catch(e){if(e&&e.name==='AbortError'){say('تم إلغاء الحفظ.')}else{say(DLMSG[e&&e.code]||'تعذر التنزيل تلقائيًا. على iPhone اختر مشاركة ثم «حفظ في الملفات».')}}}
+function save(b,n){const k=kindOf(n,b.type||''),p=document.querySelector('.pane.on');if(!p)return;const id=++DLI;DL[id]={b,n};const u=URL.createObjectURL(b);let m='';if(k==='v')m=`<video class='pv' controls playsinline src='${u}'></video>`;else if(k==='a')m=`<audio controls src='${u}' style='width:100%'></audio>`;else if(k==='i')m=`<img class='pv' src='${u}' alt=''>`;p.querySelectorAll('.rescard').forEach(r=>r.remove());p.insertAdjacentHTML('beforeend',`<div class='rescard box'><h3>النتيجة</h3>${m}<p><button class='go' data-dl='${id}'>تنزيل ${esc(n)}</button> <small class='d'>${fmt(b.size)}</small></p><p class='d' id='dls${id}'></p></div>`);p.querySelector('.rescard').scrollIntoView({behavior:'smooth',block:'center'})}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-dl]');if(t)dlFile(+t.dataset.dl)});
+
+async function startLinkDownload(){
+ const input=document.getElementById('dlUrl'),status=document.getElementById('dlStatus'),btn=document.getElementById('dlStart');
+ let url=input.value.trim(); if(!url){status.innerHTML='<p class="bad">الصق رابط المحتوى أولًا.</p>';input.focus();return}
+ try{const u=new URL(url);if(!['http:','https:'].includes(u.protocol))throw new Error();}catch{status.innerHTML='<p class="bad">الرابط غير صحيح. تأكد أنه يبدأ بـ https://</p>';return}
+ btn.disabled=true;btn.textContent='جارٍ المحاولة…';status.textContent='جارٍ الاتصال بخدمة التنزيل الخارجية…';
+ try{
+  const res=await fetch('https://api.cobalt.tools/',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({url:url,videoQuality:'1080',downloadMode:document.getElementById('dlFormat').value==='audio'?'audio':'auto',filenameStyle:'pretty'})});
+  const data=await res.json();
+  if(!res.ok)throw new Error(data?.error?.code||data?.message||('HTTP '+res.status));
+  if(data.status==='tunnel'||data.status==='redirect'||data.status==='stream'){
+   if(data.url){status.innerHTML='';const a=document.createElement('a');a.className='go';a.href=data.url;a.target='_blank';a.rel='noopener';a.textContent='فتح رابط التنزيل';status.append('تم تجهيز رابط من الخدمة: ',a);return}
+  }
+  if(data.status==='picker'&&Array.isArray(data.picker)){status.textContent='الخدمة أعادت عدة ملفات؛ افتح Cobalt لإكمال اختيار الملف.';return}
+  throw new Error(data?.error?.code||'الخدمة لم تُرجع رابط تنزيل مباشر');
+ }catch(err){status.replaceChildren();const p=document.createElement('p');p.className='bad';p.textContent='تعذر إكمال التنزيل تلقائيًا من هذه الصفحة. قد تكون خدمة Cobalt غير متاحة أو تمنع الطلبات من ملف محلي. جرّب فتح الخدمة الخارجية ثم الصق الرابط هناك.';status.append(p);const a=document.createElement('a');a.href='https://cobalt.tools/';a.target='_blank';a.rel='noopener';a.className='go';a.textContent='فتح خدمة التحميل';status.append(a);}
+ finally{btn.disabled=false;btn.textContent='التحميل'}
+}
+
+</script>
+</body>
+</html>
